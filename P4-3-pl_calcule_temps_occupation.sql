@@ -1,8 +1,8 @@
-CREATE FUNCTION gds.pl_calcule_temps_occupation (un_nom_de_salle varchar(250)) RETURNS interval AS $$
+CREATE FUNCTION gds.pl_calcule_temps_occupation (un_nom_de_salle varchar(250)) RETURNS intervalle AS $$
 DECLARE 
     un_numero_de_salle bigint;
     reservation_recurrente gds.reservation%ROWTYPE;
-    calcul interval := 0; --initialisation
+    calcul_intervalle := 0; --initialisation
 BEGIN 
     SELECT id INTO un_numero_de_salle FROM gds.salle WHERE nom = un_nom_de_salle;
     IF FOUND 
