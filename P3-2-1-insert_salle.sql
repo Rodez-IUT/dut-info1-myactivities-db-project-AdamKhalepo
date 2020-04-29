@@ -1,8 +1,10 @@
-CREATE FUNCTION gds.insert_salle(un_nom character varying(250),un_nb_personnes_max integer) 
-RETURNS salle AS $$
+-- Fonction insert salle
 
-UPDATE salle
-SET un_nom = gds.insert_salle.un_nom
-SET un_nb_personnes_max = gds.insert_salle.un_nb_personnes_max --faux
-RETURNING salle;
+CREATE OR REPLACE FUNCTION gds.insert_salle(
+        un_nom VARCHAR(250), 
+        un_nb_personnes_max integer) 
+RETURNS gds.salle AS $$
+        -- insert la salle
+        INSERT INTO gds.salle (id, nom, nb_personnes_max, date_creation, date_modification) 
+        VALUES (nextval('gds.salle_seq'),un_nom, un_nb_personnes_max, now(), now()) returning *;
 $$ LANGUAGE SQL;
