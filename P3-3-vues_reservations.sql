@@ -1,11 +1,15 @@
-CREATE VIEW gds.vue_reservations AS
-    SELECT 
-    gds.insert_salle.id AS id_salle,
-    gds.insert_salle.un_nom AS nom_salle,
-    gds.insert_reservation.une_date_debut AS debut_reservation,
-    gds.insert_reservation.une_date_fin AS fin_reservation
-    FROM gds.insert_salle
-    JOIN gds.insert_reservation
-    ON un_nom = un_nom_de_salle;
+-- vue reservations
 
-    ORDER BY un_nom, une_date_debut ASC;
+CREATE OR REPLACE VIEW gds.vue_reservations AS
+	SELECT 
+		res.id as reservation_id,
+		nom as salle,
+		date_debut,
+		date_fin
+	FROM 
+		gds.reservation res
+		JOIN
+		gds.salle salle ON salle_id = salle.id
+	ORDER BY nom, date_debut;
+
+select * from gds.vue_reservations;
