@@ -1,19 +1,24 @@
-CREATE FUNCTION gds.pl_calcule_temps_occupation (un_nom_de_salle varchar(250)) RETURNS intervalle AS $$
-DECLARE 
-    un_numero_de_salle bigint;
-    reservation_recurrente gds.reservation%ROWTYPE;
-    calcul_intervalle := 0; --initialisation
-BEGIN 
-    SELECT id INTO un_numero_de_salle FROM gds.salle WHERE nom = un_nom_de_salle;
-    IF FOUND 
-        THEN 
-            FOR reservation_recurrente IN (SELECT * FROM gds.reservation WHERE salle_id = un_numero_de_salle) LOOP
-                calcul := calcul + AGE(reservation_recurrente.date_fin, reservation_recurrente.date_debut);
-            END LOOP;
-        ELSE 
-            RAISE NOTICE 'La salle est indisponible ou est inexistante';
-            calcul := null;
-    END IF;
-    RETURN calcul;
-END;
+CREATE OR REPLACE FUNCTION gds.pl_calcule_temps_occupation(
+	un_nom_salle varchar(250)
+) RETURNS interval AS $$
+	DECLARE
+		temps_occupation interval := 0;
+		un_id_salle gds.salle.id%TYPE;
+		reservation_duree RECORD;
+	BEGIN
+		SELECT id INTO un_id_salle FROM gds.salle WHERE nom = un_nom_salle;
+		IF NOT FOUND THEN
+			RAISE NOTICE 'La salle demandée n''existe pas';
+			temps_occupation := null ;
+		ELSE
+			FOR reservation_duree IN
+				SELECT age(date_fin,date_debut) as age_res 
+				FROM gds.reservation 
+				WHERE salle_id = un_id_salle
+			LOOP
+				temps_occupation := temps_occupation + reservation_duree.age_res;
+			END LOOP;
+		END IF;
+		RETURN temps_occupation;
+	END;
 $$ LANGUAGE plpgsql;
